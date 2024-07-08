@@ -1,3 +1,20 @@
 # Robust Semi-Supervised Multimodal Medical Image Segmentation via Cross Modality Collaboration
 
-This is the PyTorch implementation of our MICCAI 2024 paper ["Robust Semi-Supervised Multimodal Medical Image Segmentation via Cross Modality Collaboration"](https://github.com/med-air/CMC "悬停显示") by Xiaogen Zhou，Yiyou Sun, Min Deng, Winnie Chiu Wing Chu，and [Qi Dou](https://www.cse.cuhk.edu.hk/~qdou/)
+This is the PyTorch implementation of our MICCAI 2024 paper ["Robust Semi-Supervised Multimodal Medical Image Segmentation via Cross Modality Collaboration"](https://github.com/med-air/CMC) by Xiaogen Zhou，Yiyou Sun, Min Deng, [Winnie Chiu Wing Chu*](https://scholar.google.com/citations?user=qgTwajMAAAAJ&hl=zh-CN&oi=ao)，and [Qi Dou*](https://www.cse.cuhk.edu.hk/~qdou/)
+* denotes corresponding authors.
+
+
+## Abstract
+Multimodal learning leverages complementary information
+derived from different modalities, thereby enhancing performance in medical image segmentation. However, prevailing multimodal learning methods heavily rely on extensive well-annotated data from various modalities to achieve accurate segmentation performance. This dependence
+often poses a challenge in clinical settings due to limited availability
+of such data. Moreover, the inherent anatomical misalignment between
+different imaging modalities further complicates the endeavor to enhance segmentation performance. To address this problem, we propose
+a novel semi-supervised multimodal segmentation framework that is robust to scarce labeled data and misaligned modalities. Our framework
+employs a novel cross modality collaboration strategy to distill modalityindependent knowledge, which is inherently associated with each modality, and integrates this information into a unified fusion layer for feature amalgamation. With a channel-wise semantic consistency loss, our
+framework ensures alignment of modality-independent information from
+a feature-wise perspective across modalities, thereby fortifying it against
+misalignments in multimodal scenarios. Furthermore, our framework effectively integrates contrastive consistent learning to regulate anatomical structures, facilitating anatomical-wise prediction alignment on unlabeled data in semi-supervised segmentation tasks. Our method achieves
+competitive performance compared to other multimodal methods across
+three tasks: cardiac, abdominal multi-organ, and thyroid-associated orbitopathy segmentations. It also demonstrates outstanding robustness in
+scenarios involving scarce labeled data and misaligned modalities.
