@@ -65,7 +65,7 @@ def main():
     parser.add_argument("--data_dir", default="./dataset/Training/", type=str, help="dataset directory")
     parser.add_argument("--json_list", default="dataset_0.json", type=str, help="dataset json file")
     # add new  args
-    parser.add_argument('--backbone', default='unet', help='backbone [swinunetr or unet or dints or unetpp]')
+    parser.add_argument('--backbone', default='SAM-Med3D', help='backbone [SAM-Med3D or swinunetr or unet or dints or unetpp]')
     parser.add_argument("--workers", default=8, type=int, help="number of workers")
     parser.add_argument("--distributed", default=0, type=int, help="number of workers")
 
@@ -211,8 +211,8 @@ def main():
         train_loader=loader[0],
         val_loader=loader[1],
         optimizer=optimizer,
-        loss_func=dice_loss,
-        consistency_loss = mse_loss,
+        loss_func=ce_loss,
+        consistency_loss = dice_loss,
         contrastive_loss = mse_loss,
         acc_func=dice_acc,
         args=args,
