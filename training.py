@@ -255,7 +255,6 @@ def run_training(
     scaler = None
     if args.amp:
         scaler = GradScaler()
-    val_acc_max = 0.0
     best_dice = 0.0
     for epoch in range(start_epoch, args.max_epochs):
         # if args.distributed:
@@ -306,7 +305,6 @@ def run_training(
                     writer.add_scalar("val_acc", val_avg_acc, epoch)
                     writer.add_scalar("epoch_dice", epoch_dice, epoch)
                 if epoch_dice > best_dice:
-                    # print("new best ({:.6f} --> {:.6f}). ".format(val_acc_max, val_avg_acc))
                     print("new best ({:.6f} --> {:.6f}). ".format(best_dice, epoch_dice))
                     best_dice = epoch_dice
                     b_new_best = True
@@ -325,4 +323,4 @@ def run_training(
 
     print("Training Finished !, Best dice: ", best_dice)
 
-    return val_acc_max
+    return best_dice

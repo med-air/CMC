@@ -20,10 +20,12 @@ import pickle
 from utils.click_method import get_next_click3D_torch_ritm, get_next_click3D_torch_2
 from utils.data_loader import Dataset_Union_ALL_Val
 
+
+
 parser = argparse.ArgumentParser()
 parser.add_argument('-tdp', '--test_data_path', type=str, default='./data/validation')
 parser.add_argument('-vp', '--vis_path', type=str, default='./visualization')
-parser.add_argument('-cp', '--checkpoint_path', type=str, default='./ckpt/sam_med3d.pth')
+parser.add_argument('-cp', '--checkpoint_path', type=str, default='./ckpt/model_final.pth')
 parser.add_argument('--save_name', type=str, default='union_out_dice.py')
 
 parser.add_argument('--image_size', type=int, default=256)
@@ -158,74 +160,6 @@ def random_point_sampling(mask, get_point = 1):
         coords, labels = torch.as_tensor(coords[indices], dtype=torch.float), torch.as_tensor(labels[indices], dtype=torch.int)
         return coords, labels
 
-
-def finetune_model_predict2D(img3D, gt3D, sam_model_tune, target_size=256, click_method='random', device='cuda', num_clicks=1, prev_masks=None):
-    pred_list = []
-    iou_list = []
-    dice_list = []
-
-    slice_mask_list = defaultdict(list)
-
-    img3D = torch.repeat_interleave(img3D, repeats=3, dim=1) # 1 channel -> 3 channel (align to RGB)
-    
-    click_points = []
-    click_labels = []
-    for slice_idx in tqdm(range(img3D.size(-1)), desc="transverse slices", leave=False):
-        img2D, gt2D = repixel_value(img3D[..., slice_idx]), gt3D[..., slice_idx]
-
-        if (gt2D==0).all():
-            empty_result = torch.zeros(list(gt3D.size()[:-1])+[1]).to(device)
-            for iter in range(num_clicks):
-                slice_mask_list[iter].append(empty_result)
-            continue
-
-        img2D = F.interpolate(img2D, (target_size, target_size), mode="bilinear", align_corners=False)
-        gt2D = F.interpolate(gt2D.float(), (target_size, target_size), mode="nearest").int()
-        
-        img2D, gt2D = img2D.to(device), gt2D.to(device)
-        img2D = (img2D - img2D.mean()) / img2D.std()
-
-        with torch.no_grad():
-            image_embeddings = sam_model_tune.image_encoder(img2D.float())
-
-        points_co, points_la = torch.zeros(1,0,2).to(device), torch.zeros(1,0).to(device)
-        low_res_masks = None
-        gt_semantic_seg = gt2D[0, 0].to(device)
-        true_masks = (gt_semantic_seg > 0)
-        for iter in range(num_clicks):
-            if(low_res_masks==None):
-                pred_masks = torch.zeros_like(true_masks).to(device)
-            else:
-                pred_masks = (prev_masks[0, 0] > 0.0).to(device) 
-            fn_masks = torch.logical_and(true_masks, torch.logical_not(pred_masks))
-            fp_masks = torch.logical_and(torch.logical_not(true_masks), pred_masks)
-            mask_to_sample = torch.logical_or(fn_masks, fp_masks)
-            new_points_co, _ = random_point_sampling(mask_to_sample.cpu(), get_point=1)
-            new_points_la = torch.Tensor([1]).to(torch.int64) if(true_masks[new_points_co[0,1].int(), new_points_co[0,0].int()]) else torch.Tensor([0]).to(torch.int64)
-            new_points_co, new_points_la = new_points_co[None].to(device), new_points_la[None].to(device)
-            points_co = torch.cat([points_co, new_points_co],dim=1)
-            points_la = torch.cat([points_la, new_points_la],dim=1)
-            prev_masks, low_res_masks, iou_predictions = sam_decoder_inference(
-                target_size, points_co, points_la, sam_model_tune, image_embeddings, 
-                mask_inputs = low_res_masks, multimask = True)
-            click_points.append(new_points_co)
-            click_labels.append(new_points_la)
-            
-            slice_mask, _ = postprocess_masks(low_res_masks, target_size, (gt3D.size(2), gt3D.size(3)))
-            slice_mask_list[iter].append(slice_mask[..., None]) # append (B, C, H, W, 1)
-        
-    for iter in range(num_clicks):
-        medsam_seg = torch.cat(slice_mask_list[iter], dim=-1).cpu().numpy().squeeze()
-        medsam_seg = medsam_seg > sam_model_tune.mask_threshold
-        medsam_seg = medsam_seg.astype(np.uint8)
-
-        pred_list.append(medsam_seg) 
-        iou_list.append(round(compute_iou(medsam_seg, gt3D[0][0].detach().cpu().numpy()), 4))
-        dice_list.append(round(compute_dice(gt3D[0][0].detach().cpu().numpy().astype(np.uint8), medsam_seg), 4))
-
-    return pred_list, click_points, click_labels, iou_list, dice_list
-
-
 def finetune_model_predict3D(img3D, gt3D, sam_model_tune, device='cuda', click_method='random', num_clicks=10, prev_masks=None):
     img3D = norm_transform(img3D.squeeze(dim=1)) # (N, C, W, H, D)
     img3D = img3D.unsqueeze(dim=1)
@@ -356,11 +290,6 @@ if __name__ == "__main__":
             if(args.dim==3):
                 seg_mask_list, points, labels, iou_list, dice_list = finetune_model_predict3D(
                     image3D, gt3D, sam_model_tune, device=device, 
-                    click_method=args.point_method, num_clicks=args.num_clicks, 
-                    prev_masks=None)
-            elif(args.dim==2):
-                seg_mask_list, points, labels, iou_list, dice_list = finetune_model_predict2D(
-                    image3D, gt3D, sam_model_tune, device=device, target_size=args.image_size,
                     click_method=args.point_method, num_clicks=args.num_clicks, 
                     prev_masks=None)
             os.makedirs(vis_root, exist_ok=True)
