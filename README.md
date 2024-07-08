@@ -10,7 +10,8 @@ This is the PyTorch implementation of our MICCAI 2024 paper ["Robust Semi-Superv
 ## Usage
 ### Installation
 #### 1. Download from GitHub
-```git clone https://github.com/med-air/CMC.git
+```
+git clone https://github.com/med-air/CMC.git
 cd CMC
 ```
 #### 2. Create conda environment
