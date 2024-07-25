@@ -104,4 +104,4 @@ Winnie Chiu Wing Chu and Qi Dou},
    }
 ```  
 ### Contact
-For any questions, please contact ‘xiaogenzhou@126.com’
+If you have any questions, please feel free to leave issues here, or contact ‘xiaogenzhou@126.com’
