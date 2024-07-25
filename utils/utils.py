@@ -550,6 +550,26 @@ def anomly_detection(pred_mask, post_pred_mask, save_path, batch, anomly_num):
 
     return left_lung_mask,right_lung_mask,total_anomly_slice_number
 
+def get_dice_score(prev_masks, gt3D): #refer to SAM-Med3D
+    def compute_dice(mask_pred, mask_gt):
+        mask_threshold = 0.5
+
+        mask_pred = (mask_pred > mask_threshold)
+        mask_gt = (mask_gt > 0)
+
+        volume_sum = mask_gt.sum() + mask_pred.sum()
+        if volume_sum == 0:
+            return np.NaN
+        volume_intersect = (mask_gt & mask_pred).sum()
+        return 2 * volume_intersect / volume_sum
+
+    pred_masks = (prev_masks >= 0.5)
+    true_masks = (gt3D > 0)
+    dice_list = []
+    for i in range(true_masks.shape[0]):
+        dice_list.append(compute_dice(pred_masks[i], true_masks[i]))
+    return (sum(dice_list) / len(dice_list)).item()
+
 def get_dataframe(post_pred_mask):
     target_array = post_pred_mask
     target_array_sum = np.sum(target_array,axis=(0,1))
