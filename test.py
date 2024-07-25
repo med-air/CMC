@@ -41,18 +41,18 @@ def validation(model, ValLoader, args):
             name =name[0].split('/')[-1]
             torch.cuda.empty_cache()
             print("name:{}, dice_MRI:{:.4f}, dice_CT:{:.4f}".format(name, dice_CT, dice_MRI))
-        avg_dice_CT = np.mean(dice_CT_arr) #0.7415
-        avg_dice_MRI = np.mean(dice_MRI_arr) # 0.8192
+        avg_dice_CT = np.mean(dice_CT_arr)
+        avg_dice_MRI = np.mean(dice_MRI_arr) 
         print("avg_dice_CT:{:.4f}, avg_dice_MRI:{:.4f}".format(avg_dice_CT, avg_dice_MRI))
 
 def main():
     import argparse
     parser = argparse.ArgumentParser(description='medical contest')
     parser.add_argument('--batch_size', default=4, type=int)
-    parser.add_argument('--img_size', default=128, type=int)
+    parser.add_argument('--img_size', default=96, type=int)
     parser.add_argument("--checkpoint", default=None, help="start training from saved checkpoint")
     parser.add_argument("--logdir", default="test_250", type=str, help="directory to save the tensorboard logs")
-    parser.add_argument('--trained_weights', default=f"./checkpoint/20_perc/model_20_perc_labeled.pt", type=str)
+    parser.add_argument('--trained_weights', default=f"./checkpoint/model_20_perc_labeled.pt", type=str)
     parser.add_argument("--rank", default=0, type=int, help="node rank for distributed training")
     parser.add_argument("--test_mode", default=1, type=int, help="node rank for distributed training")
     parser.add_argument('--backbone', default='Foundation_model', help='backbone [Foundation_model or VIT3D]')
@@ -89,9 +89,7 @@ def main():
     train_loader, val_loader, test_loader = get_loader(args)
 
     validation(model, test_loader, args)
-    # val 45 test 57
-    # avg_dice_CT:0.7628, avg_dice_MRI:0.8427  10% perc
-    # avg_dice_CT:0.8357, avg_dice_MRI:0.8905  20% perc
+
 if __name__ == "__main__":
     setup_seed()
     main()
