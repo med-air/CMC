@@ -77,8 +77,8 @@ We also provide our model checkpoints for the experiments on the AMOS dataset as
 
 |     Training      |                      CT  (Mean Dice(%))                      |                     MRI (Mean Dice(%))                    | Checkpoint |
 | :-------: | :----------------------------------------------------------: | :----------------------------------------------------------: |:-----:|
-|10% Labeled data |                            76.28                             |                            84.27                            |[[checkpoint]]([https://drive.google.com/file/d/1e-P7TEOIDJ04edFy1Eix8bTl5ZRD3l-g/view?usp=sharing](https://drive.google.com/file/d/1e-P7TEOIDJ04edFy1Eix8bTl5ZRD3l-g/view?usp=sharing)) |
-|20% Labeled data  | 84.57  | 89.05 | [[checkpoint]]([https://drive.google.com/file/d/1wq60hlEPFhotwPM5tCxcFK-hjPBZ842L/view?usp=sharing](https://gocuhk-my.sharepoint.com/:u:/r/personal/xiaogenzhou_cuhk_edu_hk/Documents/CMC/checkpoint/model_20_perc_labeled.pt?csf=1&web=1&e=iLxpaB))|
+|10% Labeled data |                            76.28                             |                            84.27                            |[[checkpoint]](https://drive.google.com/file/d/1e-P7TEOIDJ04edFy1Eix8bTl5ZRD3l-g/view?usp=sharing](https://drive.google.com/file/d/1e-P7TEOIDJ04edFy1Eix8bTl5ZRD3l-g/view?usp=sharing)) |
+|20% Labeled data  | 84.57  | 89.05 | [[checkpoint]](https://drive.google.com/file/d/1wq60hlEPFhotwPM5tCxcFK-hjPBZ842L/view?usp=sharing](https://gocuhk-my.sharepoint.com/:u:/r/personal/xiaogenzhou_cuhk_edu_hk/Documents/CMC/checkpoint/model_20_perc_labeled.pt?csf=1&web=1&e=iLxpaB))|
 
 
 
