@@ -62,12 +62,19 @@ scenarios involving scarce labeled data and misaligned modalities.
 ### 2. AMOS Dataset: [here](https://zenodo.org/records/7262581)
 
 #### Running Experiments
+#### Pre-train
+Our encoder and decoder use pre-trained weights [[link](https://www.dropbox.com/s/lyunaue0wwhmv5w/unet.pth)] and pre-trained weights [[link](https://huggingface.co/ybelkada/segment-anything/blob/main/checkpoints/sam_vit_b_01ec64.pth)]. You also can download them from [here](https://gocuhk-my.sharepoint.com/:f:/r/personal/xiaogenzhou_cuhk_edu_hk/Documents/CMC/pre-trained_weights?csf=1&web=1&e=tgVEMp) Please download them and put them into the folder 'pretrain_model' before running the following script.
+
+
 
 ```bash
-python run.py -m [supervision_mode] --data [dataset] --model [backbone] -bs [batch_size] \
-    --exp_path [experiment_path] --root [dataset_path] --spatial_size [image_size] \
-    --in_channels [image_channels] --opt [optimizer] --lr [base_lr] --max_ite [max_ite] \
-    --num_levels [num_levels] --cons_mode [cons_mode] --cons_weight [cons_weight]
+#### Training stage
+
+python main.py --backbone 'Foundation_model' --batch_size 4 --img_size 96
+
+#### Testing stage
+python test.py --backbone 'Foundation_model' 
+
 ```
 
 
@@ -80,8 +87,11 @@ We also provide our model checkpoints for the experiments on the AMOS dataset as
 |10% Labeled data |                            76.28                             |                            84.27                            |[[checkpoint]](https://drive.google.com/file/d/1e-P7TEOIDJ04edFy1Eix8bTl5ZRD3l-g/view?usp=sharing](https://drive.google.com/file/d/1e-P7TEOIDJ04edFy1Eix8bTl5ZRD3l-g/view?usp=sharing)) |
 |20% Labeled data  | 84.57  | 89.05 | [[checkpoint]](https://drive.google.com/file/d/1wq60hlEPFhotwPM5tCxcFK-hjPBZ842L/view?usp=sharing](https://gocuhk-my.sharepoint.com/:u:/r/personal/xiaogenzhou_cuhk_edu_hk/Documents/CMC/checkpoint/model_20_perc_labeled.pt?csf=1&web=1&e=iLxpaB))|
 
+>Note: Please download these checkpoints and put them into the folder 'checkpoint', then run the following script for testing to reproduce our experimental results.
 
-
+```bash
+python test.py --backbone 'Foundation_model'
+```
 ## Citation
 If this repository is useful for your research, please cite:
 ```
