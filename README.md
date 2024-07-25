@@ -35,15 +35,6 @@ scenarios involving scarce labeled data and misaligned modalities.
 
 ![](./Figures/my_flowchartl.png)
 
-## Highlights
-
-- Public gaze dataset **GazeMedSeg** for segmentation as extension for the [Kvasir-SEG](https://datasets.simula.no/kvasir-seg/) and [NCI-ISBI](https://www.cancerimagingarchive.net/analysis-result/isbi-mr-prostate-2013/) datasets.
-- A general plug-in framework for weakly-supervised medical image segmentation using gaze annotations.
-
-## Gaze Dataset
-
-Please refer to [here](/GazeMedSeg) for detailed description of our GazeMedSeg dataset.
-
 ## Getting Started
 
 #### Installation
@@ -51,28 +42,24 @@ Please refer to [here](/GazeMedSeg) for detailed description of our GazeMedSeg d
 1. Download from GitHub
 
    ```bash
-   git clone https://github.com/med-air/GazeSup.git
-   cd GazeSup
+   git clone https://github.com/med-air/CMC.git
+   
+   cd CMC
    ```
 
 2. Create conda environment
 
    ```bash
-   conda env create -f environment.yaml
-   conda activate gaze
+   conda create --name CMC python=3.8.18
+   conda activate CMC
+   pip install -r requirements.txt
+   
    ```
 
-#### Preparing Datasets
-
->Note: You can download our preprocessed dataset [here](https://drive.google.com/drive/folders/1XjgQ27R8zT8ymOTXohgl8HXntPEUbIXj?usp=sharing), allowing you to skip this and the next step to reproduce our experiments.
-
-- Download the [Kvasir-SEG](https://datasets.simula.no/kvasir-seg/) and [NCI-ISBI](https://www.cancerimagingarchive.net/analysis-result/isbi-mr-prostate-2013/) datasets from their official websites. For NCI-ISBI, please download the Training and Test sets.
-- Preprocess the datasets. We only preprocess the NCI-ISBI dataset, extracting axial slices where the prostate is present. The relevant script is [here](/notebooks/preprocess/process_nci-isbi.ipynb).
-
-#### Preparing Gaze Annotation
-
-- Download the GazeMedSeg [here](https://drive.google.com/drive/folders/1-38bG_81OsGVCb_trI00GSqfB_shCUQG?usp=sharing), and put the files under the [`/GazeMedSeg`](/GazeMedSeg) folder.
-- Generate gaze heatmaps and refined CRF maps using the scripts [here](notebooks/gaze_annotation). These scripts will create a `gaze` folder within the original dataset directory and generate gaze heatmaps and CRF maps there. The CRF maps will serve as pseudo-masks for gaze supervision.
+## Datasets
+>Note: You can download our datasets as follows, and put them into the folder 'dataset':
+### 1. MS-CMRSeg 2019 dataset: [here](https://zmiclab.github.io/zxh/0/mscmrseg19/data.html)
+### 2. AMOS Dataset: [here](https://zenodo.org/records/7262581)
 
 #### Running Experiments
 
@@ -83,22 +70,28 @@ python run.py -m [supervision_mode] --data [dataset] --model [backbone] -bs [bat
     --num_levels [num_levels] --cons_mode [cons_mode] --cons_weight [cons_weight]
 ```
 
-We provide the scripts of reproducing our experiments on the Kvasir-SEG and NCI-ISBI datasets with our gaze annotation [here](./scripts). For more details on the arguments, please refer to [parse_args.py](./parse_args.py). 
 
 #### Checkpoints
 
-We also provide the model checkpoints for the experiments as listed below (Dice is the evaluation metric).
+We also provide our model checkpoints for the experiments on the AMOS dataset as listed below (Mean Dice is the evaluation metric).
 
-|           |                      Kvasir-SEG (Polyp)                      |                     NCI-ISBI (Prostate)                      |
-| :-------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
-| Our paper |                            77.80                             |                            77.64                             |
-| Released  | 78.86<br />[[script]](./scripts/gazesup_kvasir_2_levels.sh) [[checkpoint]](https://drive.google.com/file/d/1e-P7TEOIDJ04edFy1Eix8bTl5ZRD3l-g/view?usp=sharing) | 79.20<br />[[script]](./scripts/gazesup_prostate_2_levels.sh) [[checkpoint]](https://drive.google.com/file/d/1wq60hlEPFhotwPM5tCxcFK-hjPBZ842L/view?usp=sharing) |
+|     Training      |                      CT  (Mean Dice(%))                      |                     MRI (Mean Dice(%))                    | Checkpoint |
+| :-------: | :----------------------------------------------------------: | :----------------------------------------------------------: |:-----:|
+|10% Labeled data |                            76.28                             |                            84.27                            |[[checkpoint]]([https://drive.google.com/file/d/1e-P7TEOIDJ04edFy1Eix8bTl5ZRD3l-g/view?usp=sharing](https://drive.google.com/file/d/1e-P7TEOIDJ04edFy1Eix8bTl5ZRD3l-g/view?usp=sharing)) |
+|20% Labeled data  | 84.57  | 89.05 | [[checkpoint]]([https://drive.google.com/file/d/1wq60hlEPFhotwPM5tCxcFK-hjPBZ842L/view?usp=sharing](https://gocuhk-my.sharepoint.com/:u:/r/personal/xiaogenzhou_cuhk_edu_hk/Documents/CMC/checkpoint/model_20_perc_labeled.pt?csf=1&web=1&e=iLxpaB))|
 
-## Contact
 
-If you have any questions, please feel free to leave issues here, or contact [Yuan Zhong](mailto:yuanzhong@link.cuhk.edu.hk).
 
 ## Citation
-
-``` -->
-Coming soon
+If this repository is useful for your research, please cite:
+```
+@article{2024cmc,
+     title={Robust Semi-Supervised Multimodal Medical Image Segmentation via Cross Modality Collaboration},
+     author={Xiaogen Zhon, Yiyou Sun, Min Deng,
+Winnie Chiu Wing Chu and Qi Dou},
+     journal={International Conference on Medical Image Computing and Computer Assisted Intervention},
+     year={2024}
+   }
+```  
+### Contact
+For any questions, please contact ‘xiaogenzhou@126.com’
