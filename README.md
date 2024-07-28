@@ -61,9 +61,9 @@ scenarios involving scarce labeled data and misaligned modalities.
 ### 1. MS-CMRSeg 2019 dataset: [here](https://zmiclab.github.io/zxh/0/mscmrseg19/data.html)
 ### 2. AMOS Dataset: [here](https://zenodo.org/records/7262581)
 
-#### Running Experiments
+# Running Experiments
 #### Pre-train
-Our encoder and decoder use pre-trained weights [[link](https://www.dropbox.com/s/lyunaue0wwhmv5w/unet.pth)] and pre-trained weights [[link](https://huggingface.co/ybelkada/segment-anything/blob/main/checkpoints/sam_vit_b_01ec64.pth)]. You also can download them from [here](https://gocuhk-my.sharepoint.com/:f:/r/personal/xiaogenzhou_cuhk_edu_hk/Documents/CMC/pre-trained_weights?csf=1&web=1&e=tgVEMp) Please download them and put them into the folder 'pretrain_model' before running the following script.
+Our encoder and decoder use a Foundation model's [[link](https://github.com/ljwztc/CLIP-Driven-Universal-Model)] pre-trained weights [[link](https://www.dropbox.com/s/lyunaue0wwhmv5w/unet.pth)] and pre-trained weights [[link](https://huggingface.co/ybelkada/segment-anything/blob/main/checkpoints/sam_vit_b_01ec64.pth)] in SAM-Med3D[[link](https://github.com/uni-medical/SAM-Med3D)]. You also can download them from [here](https://gocuhk-my.sharepoint.com/:f:/r/personal/xiaogenzhou_cuhk_edu_hk/Documents/CMC/pre-trained_weights?csf=1&web=1&e=tgVEMp) Please download them and put them into the folder 'pretrain_model' before running the following script.
 
 
 
