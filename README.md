@@ -53,6 +53,8 @@ scenarios involving scarce labeled data and misaligned modalities.
    conda create --name CMC python=3.8.18
    conda activate CMC
    pip install -r requirements.txt
+   # CUDA 11.8 
+   conda install pytorch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 pytorch-cuda=11.8 -c pytorch -c nvidia
    
    ```
 
