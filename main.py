@@ -13,7 +13,6 @@ from monai.transforms import Activations, AsDiscrete, Compose
 from monai.utils.enums import MetricReduction
 import torch.nn as nn
 from torch.nn.parallel import DistributedDataParallel as DDP
-from lightning import Fabric
 from torch.backends import cudnn
 import torch.distributed as dist
 from monai.metrics import DiceMetric
