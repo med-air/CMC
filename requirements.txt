@@ -23,7 +23,6 @@ cffi==1.15.1
 cfgv==3.4.0
 charset-normalizer==2.0.4
 click==7.1.2
-clip==1.0
 cloudpathlib==0.16.0
 cmake==3.29.2
 colorama==0.4.6
