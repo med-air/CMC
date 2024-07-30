@@ -57,7 +57,7 @@ scenarios involving scarce labeled data and misaligned modalities.
    ```
 
 ## Datasets
->Note: You can download our datasets as follows, and put them into the folder 'dataset':
+>Note: You can download our datasets as follows, please download our pre-processing dataset of AMOS from [here](https://gocuhk-my.sharepoint.com/:u:/r/personal/xiaogenzhou_cuhk_edu_hk/Documents/CMC/dataset_amos.zip?csf=1&web=1&e=DhoAhJ) and put them into the folder 'dataset':
 ### 1. MS-CMRSeg 2019 dataset: [here](https://zmiclab.github.io/zxh/0/mscmrseg19/data.html)
 ### 2. AMOS Dataset: [here](https://zenodo.org/records/7262581)
 
