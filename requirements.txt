@@ -179,7 +179,6 @@ shellingham==1.5.4
 SimpleITK==2.3.0
 simplejson==3.19.2
 six==1.16.0
-sklearn==0.0.post11
 smart-open==6.4.0
 smmap==5.0.1
 spacy==3.7.4
