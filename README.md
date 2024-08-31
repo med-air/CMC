@@ -99,7 +99,7 @@ If this repository is useful for your research, please cite:
 ```
 @article{2024cmc,
      title={Robust Semi-Supervised Multimodal Medical Image Segmentation via Cross Modality Collaboration},
-     author={Xiaogen Zhon, Yiyou Sun, Min Deng,
+     author={Xiaogen Zhou, Yiyou Sun, Min Deng,
 Winnie Chiu Wing Chu and Qi Dou},
      journal={International Conference on Medical Image Computing and Computer Assisted Intervention},
      year={2024}
