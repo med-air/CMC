@@ -59,13 +59,13 @@ scenarios involving scarce labeled data and misaligned modalities.
    ```
 
 ## Datasets
->Note: You can download our datasets as follows, please download our pre-processing dataset of AMOS from [here](https://gocuhk-my.sharepoint.com/:u:/r/personal/xiaogenzhou_cuhk_edu_hk/Documents/CMC/dataset_amos.zip?csf=1&web=1&e=DhoAhJ) and put them into the folder 'dataset':
+>Note: You can download our datasets as follows, please download our pre-processing dataset of AMOS from [here](https://www.dropbox.com/scl/fi/35fgk1u15r494katg2s2o/dataset_amos.zip?rlkey=nazarwb4xy42sd1joit6khisk&st=a4t2cbj0&dl=0) and put them into the folder 'dataset':
 ### 1. MS-CMRSeg 2019 dataset: [here](https://zmiclab.github.io/zxh/0/mscmrseg19/data.html)
 ### 2. AMOS Dataset: [here](https://zenodo.org/records/7262581)
 
 # Running Experiments
 #### Pre-train
-Our encoder and decoder use a Foundation model's [[link](https://github.com/ljwztc/CLIP-Driven-Universal-Model)] pre-trained weights [[link](https://www.dropbox.com/s/lyunaue0wwhmv5w/unet.pth)] and pre-trained weights [[link](https://huggingface.co/ybelkada/segment-anything/blob/main/checkpoints/sam_vit_b_01ec64.pth)] in SAM-Med3D[[link](https://github.com/uni-medical/SAM-Med3D)]. You also can download them from [here](https://gocuhk-my.sharepoint.com/:f:/r/personal/xiaogenzhou_cuhk_edu_hk/Documents/CMC/pre-trained_weights?csf=1&web=1&e=tgVEMp) Please download them and put them into the folder 'pretrain_model' before running the following script.
+Our encoder and decoder use a Foundation model's [[link](https://github.com/ljwztc/CLIP-Driven-Universal-Model)] pre-trained weights [[link](https://www.dropbox.com/s/lyunaue0wwhmv5w/unet.pth)] and pre-trained weights [[link](https://huggingface.co/ybelkada/segment-anything/blob/main/checkpoints/sam_vit_b_01ec64.pth)] in SAM-Med3D[[link](https://github.com/uni-medical/SAM-Med3D)]. You also can download them from [here](https://www.dropbox.com/scl/fo/ia2ncjmkuu936mtnyxc9i/AKhArloHIouMLGZo6Kg4pVo?rlkey=st66ps25bnye0dn3c1ojdixr6&st=rnm51qk4&dl=0) Please download them and put them into the folder 'pretrain_model' before running the following script.
 
 
 
@@ -86,8 +86,8 @@ We also provide our model checkpoints for the experiments on the AMOS dataset as
 
 |     Training      |                      CT  (Mean Dice(%))                      |                     MRI (Mean Dice(%))                    | Checkpoint |
 | :-------: | :----------------------------------------------------------: | :----------------------------------------------------------: |:-----:|
-|10% Labeled data |                            76.28                             |                            84.27                            |[[checkpoint]](https://gocuhk-my.sharepoint.com/:u:/r/personal/xiaogenzhou_cuhk_edu_hk/Documents/CMC/checkpoint/model_10_perc_labeled.pt?csf=1&web=1&e=SdfHvg)) |
-|20% Labeled data  | 84.57  | 89.05 | [[checkpoint]](https://gocuhk-my.sharepoint.com/:u:/r/personal/xiaogenzhou_cuhk_edu_hk/Documents/CMC/checkpoint/model_20_perc_labeled.pt?csf=1&web=1&e=d7Bxyp)|
+|10% Labeled data |                            76.28                             |                            84.27                            |[[checkpoint]](https://www.dropbox.com/scl/fi/8ggzj3cvp8otrf8342nq5/model_10_perc_labeled.pt?rlkey=tlf0sxolucpmbilcinfyhz0c3&st=n653e7ho&dl=0)) |
+|20% Labeled data  | 84.57  | 89.05 | [[checkpoint]](https://www.dropbox.com/scl/fi/ebvp2pzcw4cbgbh6hi684/model_20_perc_labeled.pt?rlkey=h9jl5dsmvxomk9pa45iu1bnkb&st=3895hlnz&dl=0)|
 
 >Note: Please download these checkpoints and put them into the folder 'checkpoint', then run the following script for testing to reproduce our experimental results.
 
