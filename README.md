@@ -72,7 +72,7 @@ Our encoder and decoder use a Foundation model's [[link](https://github.com/ljwz
 ```bash
 #### Training stage
 
-python main.py --backbone 'Foundation_model' --batch_size 4 --img_size 96
+python main.py --backbone 'Foundation_model' --batch_size 4 --img_size 128
 
 #### Testing stage
 python test.py --backbone 'Foundation_model' 
