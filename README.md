@@ -89,10 +89,10 @@ python test.py
 
 We also provide our model checkpoints for the experiments on the AMOS dataset as listed below (Mean Dice is the evaluation metric).
 
-| Training  | CT  (Spleen Mean Dice(%))  |   CT  (Right kidney Mean Dice(%))     |  CT  (Left kidney Mean Dice(%))       |  CT  (Liver Mean Dice(%))  | CT Overall Mean Dice (%)  | Checkpoint |
+| Training  | Spleen Mean Dice(%)  |   Right kidney Mean Dice(%)     |  Left kidney Mean Dice(%)       |  Liver Mean Dice(%)  | Overall Mean Dice (%)  | Checkpoint |
 | :-------: | :-------: | :-------: |:-------: |:-------: | :-------: |:-----:|
-|20%/10% Labeled data |       72.36        |          78.04   |    78.36  | 85.10  | 78.46        |[[checkpoint]](https://pan.quark.cn/list#/list/all/44b4447c7dea48c697cf9bdc70de1b35-CMC_data/513be8de50ed4f7e850ee2b7816f1e24-pretrained_checkpoints/c05af5f325c944699cfd61a9ce0f4e61-saved_checkpoint)) |
-
+|CT modality: 10% (20%) Labeled data |       72.36 (77.80)       |          78.04 (81.78)  |    78.36 (79.07)  | 85.10 (87.55) | 78.46 (81.55)        |[[checkpoint]](https://pan.quark.cn/list#/list/all/44b4447c7dea48c697cf9bdc70de1b35-CMC_data/513be8de50ed4f7e850ee2b7816f1e24-pretrained_checkpoints/c05af5f325c944699cfd61a9ce0f4e61-saved_checkpoint)) |
+|MRI modality: 10% (20%) Labeled data |       79.86 (80.21)      |          81.94 (85.45)  |    80.64 (87.54) | 86.10 (88.24)  | 81.70 (87.42)       |[[checkpoint]](https://pan.quark.cn/list#/list/all/44b4447c7dea48c697cf9bdc70de1b35-CMC_data/513be8de50ed4f7e850ee2b7816f1e24-pretrained_checkpoints/c05af5f325c944699cfd61a9ce0f4e61-saved_checkpoint)) |
 
 >Note: Please download these checkpoints and put them into the folder './run/saved_checkpoint', then run the following script for testing to reproduce our experimental results.
 
