@@ -6,6 +6,7 @@ from model.attention.DANet import DAModule,DASModule
 from functools import partial
 from segment_anything.modeling import ImageEncoderViT3D, MaskDecoder3D
 import torchio as tio
+from monai.networks.blocks import PatchEmbed, UnetOutBlock, UnetrBasicBlock, UnetrUpBlock
 
 class MLPBlock(nn.Module):
     def __init__(
@@ -22,7 +23,24 @@ class MLPBlock(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.lin2(self.act(self.lin1(x)))
 
+class LUConv(nn.Module):
+    def __init__(self, in_chan, out_chan, act):
+        super(LUConv, self).__init__()
+        self.conv1 = nn.Conv3d(in_chan, out_chan, kernel_size=3, padding=1)
+        self.bn1 = ContBatchNorm3d(out_chan)
 
+        if act == 'relu':
+            self.activation = nn.ReLU(out_chan)
+        elif act == 'prelu':
+            self.activation = nn.PReLU(out_chan)
+        elif act == 'elu':
+            self.activation = nn.ELU(inplace=True)
+        else:
+            raise
+
+    def forward(self, x):
+        out = self.activation(self.bn1(self.conv1(x)))
+        return out
 class LayerNorm3d(nn.Module):
     def __init__(self, num_channels: int, eps: float = 1e-6) -> None:
         super().__init__()
@@ -39,206 +57,6 @@ class LayerNorm3d(nn.Module):
 
 
 # This class and its supporting functions below lightly adapted from the ViTDet backbone available at: https://github.com/facebookresearch/detectron2/blob/main/detectron2/modeling/backbone/vit.py # noqa
-class ImageEncoderViT3D(nn.Module):
-    def __init__(
-            self,
-            img_size: int = 256,
-            patch_size: int = 16,
-            in_chans: int = 1,
-            embed_dim: int = 768,
-            depth: int = 12,
-            num_heads: int = 12,
-            mlp_ratio: float = 4.0,
-            out_chans: int = 256,
-            qkv_bias: bool = True,
-            norm_layer: Type[nn.Module] = nn.LayerNorm,
-            act_layer: Type[nn.Module] = nn.GELU,
-            use_abs_pos: bool = True,
-            use_rel_pos: bool = False,
-            rel_pos_zero_init: bool = True,
-            window_size: int = 0,
-            global_attn_indexes: Tuple[int, ...] = (),
-    ) -> None:
-        """
-        Args:
-            img_size (int): Input image size.
-            patch_size (int): Patch size.
-            in_chans (int): Number of input image channels.
-            embed_dim (int): Patch embedding dimension.
-            depth (int): Depth of ViT.
-            num_heads (int): Number of attention heads in each ViT block.
-            mlp_ratio (float): Ratio of mlp hidden dim to embedding dim.
-            qkv_bias (bool): If True, add a learnable bias to query, key, value.
-            norm_layer (nn.Module): Normalization layer.
-            act_layer (nn.Module): Activation layer.
-            use_abs_pos (bool): If True, use absolute positional embeddings.
-            use_rel_pos (bool): If True, add relative positional embeddings to the attention map.
-            rel_pos_zero_init (bool): If True, zero initialize relative positional parameters.
-            window_size (int): Window size for window attention blocks.
-            global_attn_indexes (list): Indexes for blocks using global attention.
-        """
-        super().__init__()
-        self.img_size = img_size
-
-        self.patch_embed = PatchEmbed3D(
-            kernel_size=(patch_size, patch_size, patch_size),
-            stride=(patch_size, patch_size, patch_size),
-            in_chans=in_chans,
-            embed_dim=embed_dim,
-        )
-
-        self.pos_embed: Optional[nn.Parameter] = None
-        if use_abs_pos:
-            # Initialize absolute positional embedding with pretrain image size.
-            self.pos_embed = nn.Parameter(
-                torch.zeros(1, img_size // patch_size, img_size // patch_size, img_size // patch_size, embed_dim)
-            )
-
-        self.blocks = nn.ModuleList()
-        for i in range(depth):
-            block = Block3D(
-                dim=embed_dim,
-                num_heads=num_heads,
-                mlp_ratio=mlp_ratio,
-                qkv_bias=qkv_bias,
-                norm_layer=norm_layer,
-                act_layer=act_layer,
-                use_rel_pos=use_rel_pos,
-                rel_pos_zero_init=rel_pos_zero_init,
-                window_size=window_size if i not in global_attn_indexes else 0,
-                input_size=(img_size // patch_size, img_size // patch_size, img_size // patch_size),
-            )
-            self.blocks.append(block)
-
-        self.neck = nn.Sequential(
-            nn.Conv3d(
-                embed_dim,
-                out_chans,
-                kernel_size=1,
-                bias=False,
-            ),
-            # nn.LayerNorm(out_chans),
-            LayerNorm3d(out_chans),
-            nn.Conv3d(
-                out_chans,
-                out_chans,
-                kernel_size=3,
-                padding=1,
-                bias=False,
-            ),
-            LayerNorm3d(out_chans),
-            # nn.LayerNorm(out_chans),
-        )
-        # [1, 64, 32, 32, 32]
-        # [1, 128, 16, 16, 16]
-        # [1, 256, 8, 8, 8]
-        # [1, 512, 4, 4, 4]
-        self.neck_64 = nn.Sequential(
-            nn.Conv3d(
-                embed_dim,
-                128,
-                kernel_size=1,
-                bias=False,
-            ),
-            # nn.LayerNorm(out_chans),
-            LayerNorm3d(128),
-            # nn.MaxPool3d(2),
-            nn.ConvTranspose3d(128, 64, kernel_size=2, stride=2),
-            nn.Conv3d(
-                64,
-                64,
-                kernel_size=3,
-                padding=1,
-                bias=False,
-            ),
-            LayerNorm3d(64),
-            # nn.LayerNorm(out_chans),
-        )
-        self.neck_128 = nn.Sequential(
-            nn.Conv3d(
-                embed_dim,
-                128,
-                kernel_size=1,
-                bias=False,
-            ),
-            # nn.LayerNorm(out_chans),
-            LayerNorm3d(128),
-            # nn.MaxPool3d(2),
-            # nn.ConvTranspose3d(128, 128, kernel_size=2, stride=2),
-            nn.Conv3d(
-                128,
-                128,
-                kernel_size=3,
-                padding=1,
-                bias=False,
-            ),
-            LayerNorm3d(128),
-            # nn.LayerNorm(out_chans),
-        )
-
-        self.neck_256 = nn.Sequential(
-            nn.Conv3d(
-                embed_dim,
-                256,
-                kernel_size=1,
-                bias=False,
-            ),
-            # nn.LayerNorm(out_chans),
-            LayerNorm3d(256),
-            nn.MaxPool3d(2),
-            # nn.ConvTranspose3d(256, 256, kernel_size=2, stride=2),
-            nn.Conv3d(
-                256,
-                256,
-                kernel_size=3,
-                padding=1,
-                bias=False,
-            ),
-            LayerNorm3d(256),
-            # nn.LayerNorm(out_chans),
-        )
-        self.neck_512 = nn.Sequential(
-            nn.Conv3d(
-                embed_dim,
-                512,
-                kernel_size=1,
-                bias=False,
-            ),
-            # nn.LayerNorm(out_chans),
-            LayerNorm3d(512),
-            nn.MaxPool3d(4),
-            nn.Conv3d(
-                512,
-                512,
-                kernel_size=3,
-                padding=1,
-                bias=False,
-            ),
-            LayerNorm3d(512),
-            # nn.LayerNorm(out_chans),
-        )
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # input_size = [1,1,256,256,256]
-        # import IPython; IPython.embed()
-        x = self.patch_embed(x)
-        # x = [1,16,16,16,768]
-        # import pdb; pdb.set_trace()
-        if self.pos_embed is not None:
-            x = x + self.pos_embed
-
-        for blk in self.blocks:
-            x = blk(x)
-
-        x_64 = self.neck_64(x.permute(0, 4, 1, 2, 3))
-        x_128 = self.neck_128(x.permute(0, 4, 1, 2, 3))
-        x_256 = self.neck_256(x.permute(0, 4, 1, 2, 3))
-        x_512 = self.neck_512(x.permute(0, 4, 1, 2, 3))
-        # x = self.neck(x.permute(0, 4, 1, 2, 3))
-        # output_size = [1,256,16,16,16]
-        return x_512, [x_64,x_128,x_256,x_512]
-
-
 class Block3D(nn.Module):
     """Transformer blocks with support of window attention and residual propagation blocks"""
 
@@ -799,7 +617,7 @@ class multimodal_segmentation(nn.Module):
         right_kidney = torch.ones((2, 1, 96, 96, 96))
         model = UnetClassification(n_class=4)
         # load pretrain model
-        pretrain = "/home/zxg/zxg_code/TransUnet_Challenge/unet_classification/pretrain_model/unet.pth"
+        pretrain = "/home/zxg/zxg_code/TransUnet_Challenge/unet_classification/pretrain_model/Foundation_model.pth"
         model.load_params(torch.load(pretrain, map_location='cpu')['net'])
         # pred = model(liver, spleen, left_kidney, right_kidney)
         pred = model(liver)

@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.checkpoint as checkpoint
 from torch.nn import LayerNorm
-from models.models import ImageEncoderViT3D, MIA_Module, Encoder, Decoder, FusionLayer
+from model.models import MIA_Module, Encoder, Decoder, FusionLayer
 import torchio as tio
 from functools import partial
 
@@ -27,20 +27,6 @@ class Semi_SM_model(nn.Module):
             self.prompt_embed_dim = 384
             self.encoder_global_attn_indexes = [2, 5, 8, 11]
             self.norm_transform = tio.ZNormalization(masking_method=lambda x: x > 0)
-            self.image_encoder = ImageEncoderViT3D(
-                depth=self.encoder_depth,
-                embed_dim=self.encoder_embed_dim,
-                img_size=self.image_size,
-                mlp_ratio=4,
-                norm_layer=partial(torch.nn.LayerNorm, eps=1e-6),
-                num_heads=self.encoder_num_heads,
-                patch_size=self.vit_patch_size,
-                qkv_bias=True,
-                use_rel_pos=True,
-                global_attn_indexes=self.encoder_global_attn_indexes,
-                window_size=14,
-                out_chans=self.prompt_embed_dim,
-            )
             self.decoder = Decoder()
             self.MIA_module = MIA_Module(16)
             self.fusion_layer = FusionLayer(512, 512, 1, act='relu')
@@ -111,4 +97,8 @@ class Semi_SM_model(nn.Module):
         CT_seg_out = self.decoder(CT_F_z, CT_Skips)
         MRI_seg_out = self.decoder(MRI_F_z, MRI_Skips)
 
+
+        # CT_MRI_seg_out = torch.cat([CT_seg_out, MRI_seg_out], dim=1)
         return CT_img_F_ds, MRI_img_F_ds, CT_seg_out, MRI_seg_out
+        # return CT_seg_out, MRI_seg_out
+        # return CT_MRI_seg_out

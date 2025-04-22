@@ -47,6 +47,67 @@ def _make_nConv(in_channel, depth, act, double_chnnel=False):
 
     return nn.Sequential(layer1,layer2)
 
+class fusionLayer(nn.Module):
+    def __init__(self, in_channel, outChans, depth, act):
+        super(fusionLayer, self).__init__()
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x1, x2):
+        m_batchsize, C, depth, height, width = x1.size()
+        fusion = self.sigmoid((x1+x2))
+        # proj_value = x1.view(m_batchsize, C, -1)
+        # out = torch.bmm(attention, proj_value)
+        out = fusion.view(m_batchsize, C, depth, height, width)
+        return out
+class SCSELayer(nn.Module):
+    def __init__(self, channel=32, reduction=8):
+        super(SCSELayer, self).__init__()
+        self.cse_avg_pool = nn.AdaptiveAvgPool3d(1)
+        self.cse_fc = nn.Sequential(
+            nn.Linear(channel, channel // reduction, bias=False),
+            nn.ReLU(inplace=True),
+            nn.Linear(channel // reduction, channel, bias=False),
+            nn.Sigmoid()
+        )
+        self.sse_conv = nn.Conv3d(channel, 1, 1, padding=0)
+
+    def forward(self, x):
+        b, c, z, w, h = x.size()
+        cse_y = self.cse_avg_pool(x).view(b, c)
+        cse_y = self.cse_fc(cse_y).view(b, c, 1, 1, 1)
+        sse_y = self.sse_conv(x)
+
+        return x * cse_y.expand_as(x) + x * sse_y.expand_as(x)
+
+class MIA_Module(nn.Module):
+    """ Channel attention module"""
+
+    def __init__(self, in_dim):
+        super(MIA_Module, self).__init__()
+        self.chanel_in = in_dim
+
+        self.gamma = nn.Parameter(torch.zeros(1))
+        self.softmax = nn.Softmax(dim=-1)
+
+    def forward(self, x):
+        """
+            inputs :
+                x : input feature maps( B X C X z*y*x)
+            returns :
+                out : attention value + input feature
+                attention: B X C X C
+        """
+        m_batchsize, C, depth, height, width = x.size()
+        proj_query = x.view(m_batchsize, C, -1)
+        proj_key = x.view(m_batchsize, C, -1).permute(0, 2, 1)
+        energy = torch.bmm(proj_query, proj_key)
+        energy_new = torch.max(energy, -1, keepdim=True)[0].expand_as(energy) - energy
+        attention = self.softmax(energy_new)
+        proj_value = x.view(m_batchsize, C, -1)
+        out = torch.bmm(attention, proj_value)
+        out = out.view(m_batchsize, C, depth, height, width)
+        out = self.gamma * out + x
+        return out
 
 # class InputTransition(nn.Module):
 #     def __init__(self, outChans, elu):
@@ -121,7 +182,7 @@ class UNet3D(nn.Module):
         self.up_tr64 = UpTransition(128,128,0,act)
         # self.out_tr = OutputTransition(64, n_class)
 
-    def forward(self, x):
+    def forward(self, x1,x2):
         self.out64, self.skip_out64 = self.down_tr64(x)
         self.out128,self.skip_out128 = self.down_tr128(self.out64)
         self.out256,self.skip_out256 = self.down_tr256(self.out128)
@@ -130,7 +191,7 @@ class UNet3D(nn.Module):
         self.out_up_256 = self.up_tr256(self.out512,self.skip_out256)
         self.out_up_128 = self.up_tr128(self.out_up_256, self.skip_out128)
         self.out_up_64 = self.up_tr64(self.out_up_128, self.skip_out64)
-        # self.out = self.out_tr(self.out_up_64)
+        self.out = self.out_tr(self.out_up_64)
 
         return self.out512, self.out_up_64
 
