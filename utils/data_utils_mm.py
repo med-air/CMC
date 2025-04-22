@@ -62,7 +62,7 @@ def get_loader(args):
 
     ### training ############
     file_root = "./dataset/dataset_amos/96_train_npz"
-    labels_df = pd.read_csv('./dataset/dataset_amos/train_list_10_perc.csv',
+    labels_df = pd.read_csv('./dataset/dataset_amos/train_list_20_perc.csv',
                             index_col="Case_ID")
     train_images = []
     train_labels = []
@@ -89,7 +89,7 @@ def get_loader(args):
     val_labels = torch.FloatTensor(val_labels)
 
     ### testing ############
-    test_file_root = "./dataset/dataset_amos/96_test_npz"
+    test_file_root = "./dataset/dataset_amos/96_test_npz_zxg"
     test_labels_df = pd.read_csv('./dataset/dataset_amos/test_list.csv',
         index_col="Case_ID")
     test_images = []
