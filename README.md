@@ -59,23 +59,28 @@ scenarios involving scarce labeled data and misaligned modalities.
    ```
 
 ## Datasets
->Note: You can download our datasets as follows, please download our pre-processing dataset of AMOS from [here](https://www.dropbox.com/scl/fi/35fgk1u15r494katg2s2o/dataset_amos.zip?rlkey=nazarwb4xy42sd1joit6khisk&st=a4t2cbj0&dl=0) and put them into the folder 'dataset':
+>Note: You can download our datasets as follows, please download our pre-processing dataset of AMOS from [here](https://pan.quark.cn/list#/list/all/44b4447c7dea48c697cf9bdc70de1b35-CMC_data/02961a722377466d848782dd86d97fab-AMOS) and put them into the folder 'dataset/mm_amos/':
 ### 1. MS-CMRSeg 2019 dataset: [here](https://zmiclab.github.io/zxh/0/mscmrseg19/data.html)
 ### 2. AMOS Dataset: [here](https://zenodo.org/records/7262581)
 
 # Running Experiments
 #### Pre-train
-Our encoder and decoder use a Foundation model's [[link](https://github.com/ljwztc/CLIP-Driven-Universal-Model)] pre-trained weights [[link](https://www.dropbox.com/s/lyunaue0wwhmv5w/unet.pth)] and pre-trained weights [[link](https://huggingface.co/ybelkada/segment-anything/blob/main/checkpoints/sam_vit_b_01ec64.pth)] in SAM-Med3D[[link](https://github.com/uni-medical/SAM-Med3D)]. You also can download them from [here](https://www.dropbox.com/scl/fo/ia2ncjmkuu936mtnyxc9i/AKhArloHIouMLGZo6Kg4pVo?rlkey=st66ps25bnye0dn3c1ojdixr6&st=rnm51qk4&dl=0) Please download them and put them into the folder 'pretrain_model' before running the following script.
+Our encoder and decoder use a Foundation model's [[link](https://github.com/ljwztc/CLIP-Driven-Universal-Model)] pre-trained weights [[link]([https://www.dropbox.com/s/lyunaue0wwhmv5w/unet.pth](https://pan.quark.cn/s/2ce82bc2c684))]. Please download them and put them into the folder 'pretrained_model' before running the following script.
 
 
 
 ```bash
 #### Training stage
 
-python main.py --backbone 'Foundation_model' --batch_size 4 --img_size 128
+
+## multi GPU for training with DDP 
+python main.py --distributed
+
+## single GPU for training 
+python main.py
 
 #### Testing stage
-python test.py --backbone 'Foundation_model' 
+python test.py
 
 ```
 
@@ -84,16 +89,16 @@ python test.py --backbone 'Foundation_model'
 
 We also provide our model checkpoints for the experiments on the AMOS dataset as listed below (Mean Dice is the evaluation metric).
 
-|     Training      |                      CT  (Mean Dice(%))                      |                     MRI (Mean Dice(%))                    | Checkpoint |
+|     Training  | CT  (Spleen Mean Dice(%))  |   CT  (Right kidney Mean Dice(%))     |  CT  (Left kidney Mean Dice(%))       |  CT  (Liver Mean Dice(%))  | CT Overall Mean Dice (%)  | Checkpoint |
 | :-------: | :----------------------------------------------------------: | :----------------------------------------------------------: |:-----:|
-|10% Labeled data |                            76.28                             |                            84.27                            |[[checkpoint]](https://www.dropbox.com/scl/fi/8ggzj3cvp8otrf8342nq5/model_10_perc_labeled.pt?rlkey=tlf0sxolucpmbilcinfyhz0c3&st=n653e7ho&dl=0)) |
-|20% Labeled data  | 84.57  | 89.05 | [[checkpoint]](https://www.dropbox.com/scl/fi/ebvp2pzcw4cbgbh6hi684/model_20_perc_labeled.pt?rlkey=h9jl5dsmvxomk9pa45iu1bnkb&st=3895hlnz&dl=0)|
+|20%/10% Labeled data |       72.36        |          78.04   |    78.36  | 85.10  | 78.46        |[[checkpoint]](https://pan.quark.cn/list#/list/all/44b4447c7dea48c697cf9bdc70de1b35-CMC_data/513be8de50ed4f7e850ee2b7816f1e24-pretrained_checkpoints/c05af5f325c944699cfd61a9ce0f4e61-saved_checkpoint)) |
+|     Training  | MRI  (Spleen Mean Dice(%))  |   MRI  (Right kidney Mean Dice(%))     |  MRI  (Left kidney Mean Dice(%))       |  MRI  (Liver Mean Dice(%))  | MRI Overall Mean Dice (%)  | Checkpoint |
+| :-------: | :----------------------------------------------------------: | :----------------------------------------------------------: |:-----:|
+|20%/10% Labeled data |       79.36       |          83.94   |    89.71  | 93.83 | 86.71        |[[checkpoint]](https://pan.quark.cn/list#/list/all/44b4447c7dea48c697cf9bdc70de1b35-CMC_data/513be8de50ed4f7e850ee2b7816f1e24-pretrained_checkpoints/c05af5f325c944699cfd61a9ce0f4e61-saved_checkpoint)) |
 
->Note: Please download these checkpoints and put them into the folder 'checkpoint', then run the following script for testing to reproduce our experimental results.
+>Note: Please download these checkpoints and put them into the folder './run/saved_checkpoint', then run the following script for testing to reproduce our experimental results.
 
-```bash
-python test.py --backbone 'Foundation_model'
-```
+
 ## Citation
 If this repository is useful for your research, please cite:
 ```
