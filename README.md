@@ -90,7 +90,7 @@ python test.py
 We also provide our model checkpoints for the experiments on the AMOS dataset as listed below (Mean Dice is the evaluation metric).
 
 | Training  | CT  (Spleen Mean Dice(%))  |   CT  (Right kidney Mean Dice(%))     |  CT  (Left kidney Mean Dice(%))       |  CT  (Liver Mean Dice(%))  | CT Overall Mean Dice (%)  | Checkpoint |
-| :-------: | :----------------------------------------------------------: | :----------------------------------------------------------: |:-----:|
+| :-------: | :-------: | :-------: |:-------: |:-------: | :-------: |:-----:|
 |20%/10% Labeled data |       72.36        |          78.04   |    78.36  | 85.10  | 78.46        |[[checkpoint]](https://pan.quark.cn/list#/list/all/44b4447c7dea48c697cf9bdc70de1b35-CMC_data/513be8de50ed4f7e850ee2b7816f1e24-pretrained_checkpoints/c05af5f325c944699cfd61a9ce0f4e61-saved_checkpoint)) |
 
 
