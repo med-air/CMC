@@ -1,0 +1,60 @@
+{ "labels": {
+    "0": "background",
+    "1": "spleen",
+    "2": "right kidney",
+    "3": "left kidney",
+    "4": "gall bladder",
+    "5": "esophagus",
+    "6": "liver",
+    "7": "stomach",
+    "8": "arota",
+    "9": "postcava",
+    "10": "pancreas",
+    "11": "right adrenal gland",
+    "12": "left adrenal gland",
+    "13": "duodenum"},
+    "numTraining": 40,
+    "numValidation": 10,
+    "numTest": 10,
+"training": [
+    {
+        "img_CT": "./train_data/images/amos_0001_CT.nii.gz",
+        "mask_CT": "./train_data/masks/amos_0001_CT_gt.nii.gz",
+        "img_MRI": "./train_data/images/amos_0001_MRI.nii.gz",
+        "mask_MRI": "./train_data/masks/amos_0001_MRI_gt.nii.gz"
+    }],
+"unlabeled_training": [
+    {
+        "img_CT": "./train_data/images/amos_0002_CT.nii.gz",
+        "mask_CT": "./train_data/masks/amos_0002_CT_gt.nii.gz",
+        "img_MRI": "./train_data/images/amos_0002_MRI.nii.gz",
+        "mask_MRI": "./train_data/masks/amos_0002_MRI_gt.nii.gz"
+    }],
+"validation":[
+    {
+        "img_CT": "./val_data/images/amos_00049_CT.nii.gz",
+        "mask_CT": "./val_data/masks/amos_00049_CT_gt.nii.gz",
+        "img_MRI": "./val_data/images/amos_00049_MRI.nii.gz",
+        "mask_MRI": "./val_data/masks/amos_00049_MRI_gt.nii.gz"
+    },
+    {
+        "img_CT": "./val_data/images/amos_00050_CT.nii.gz",
+        "mask_CT": "./val_data/masks/amos_00050_CT_gt.nii.gz",
+        "img_MRI": "./val_data/images/amos_00050_MRI.nii.gz",
+        "mask_MRI": "./val_data/masks/amos_00050_MRI_gt.nii.gz"
+    }],
+"testing":[
+    {
+        "img_CT": "./test_data/images/amos_00056_CT.nii.gz",
+        "mask_CT": "./test_data/masks/amos_00056_CT_gt.nii.gz",
+        "img_MRI": "./test_data/images/amos_00056_MRI.nii.gz",
+        "mask_MRI": "./test_data/masks/amos_00056_MRI_gt.nii.gz"
+    },
+    {
+        "img_CT": "./test_data/images/amos_00057_CT.nii.gz",
+        "mask_CT": "./test_data/masks/amos_00057_CT_gt.nii.gz",
+        "img_MRI": "./test_data/images/amos_00057_MRI.nii.gz",
+        "mask_MRI": "./test_data/masks/amos_00057_MRI_gt.nii.gz"
+    }
+]}
+
