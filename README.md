@@ -89,12 +89,10 @@ python test.py
 
 We also provide our model checkpoints for the experiments on the AMOS dataset as listed below (Mean Dice is the evaluation metric).
 
-|     Training  | CT  (Spleen Mean Dice(%))  |   CT  (Right kidney Mean Dice(%))     |  CT  (Left kidney Mean Dice(%))       |  CT  (Liver Mean Dice(%))  | CT Overall Mean Dice (%)  | Checkpoint |
+| Training  | CT  (Spleen Mean Dice(%))  |   CT  (Right kidney Mean Dice(%))     |  CT  (Left kidney Mean Dice(%))       |  CT  (Liver Mean Dice(%))  | CT Overall Mean Dice (%)  | Checkpoint |
 | :-------: | :----------------------------------------------------------: | :----------------------------------------------------------: |:-----:|
 |20%/10% Labeled data |       72.36        |          78.04   |    78.36  | 85.10  | 78.46        |[[checkpoint]](https://pan.quark.cn/list#/list/all/44b4447c7dea48c697cf9bdc70de1b35-CMC_data/513be8de50ed4f7e850ee2b7816f1e24-pretrained_checkpoints/c05af5f325c944699cfd61a9ce0f4e61-saved_checkpoint)) |
-|     Training  | MRI  (Spleen Mean Dice(%))  |   MRI  (Right kidney Mean Dice(%))     |  MRI  (Left kidney Mean Dice(%))       |  MRI  (Liver Mean Dice(%))  | MRI Overall Mean Dice (%)  | Checkpoint |
-| :-------: | :----------------------------------------------------------: | :----------------------------------------------------------: |:-----:|
-|20%/10% Labeled data |       79.36       |          83.94   |    89.71  | 93.83 | 86.71        |[[checkpoint]](https://pan.quark.cn/list#/list/all/44b4447c7dea48c697cf9bdc70de1b35-CMC_data/513be8de50ed4f7e850ee2b7816f1e24-pretrained_checkpoints/c05af5f325c944699cfd61a9ce0f4e61-saved_checkpoint)) |
+
 
 >Note: Please download these checkpoints and put them into the folder './run/saved_checkpoint', then run the following script for testing to reproduce our experimental results.
 
