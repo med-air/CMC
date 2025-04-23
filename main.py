@@ -25,7 +25,7 @@ from utils.Semi_MM_data_utils import get_loader
 from monai.inferers import sliding_window_inference
 from monai.losses import DiceCELoss
 from monai.metrics import DiceMetric
-from model.Semi_SM_model import Semi_SM_model
+from model.Semi_SM_model_MIA import Semi_SM_model
 
 from monai.transforms import AsDiscrete
 from monai.utils.enums import MetricReduction
