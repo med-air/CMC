@@ -247,9 +247,9 @@ class Semi_SM_model(nn.Module):
         MRI_img_F_mia = self.MIA_module(MRI_img_F_ds)
         #
         #
-        if CT_img_F_ds.shape[2] != MRI_img_F_ds.shape[2]:
-            m_batchsize, C, depth, height, width = CT_img_F_ds.size()
-            MRI_img_F_ds = F.interpolate(MRI_img_F_ds, size=(depth, height, width), mode='trilinear',
+        #if CT_img_F_ds.shape[2] != MRI_img_F_ds.shape[2]:
+         #   m_batchsize, C, depth, height, width = CT_img_F_ds.size()
+         #   MRI_img_F_ds = F.interpolate(MRI_img_F_ds, size=(depth, height, width), mode='trilinear',
                                      align_corners=True)
 
         out_fuse = self.fusion_layer(CT_img_F_mia, MRI_img_F_mia)
