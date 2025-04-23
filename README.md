@@ -65,7 +65,7 @@ scenarios involving scarce labeled data and misaligned modalities.
 
 # Running Experiments
 #### Pre-train
-Our encoder and decoder use a Foundation model's [[link](https://github.com/ljwztc/CLIP-Driven-Universal-Model)] pre-trained weights [[link]([https://www.dropbox.com/s/lyunaue0wwhmv5w/unet.pth](https://pan.quark.cn/s/2ce82bc2c684))]. Please download them and put them into the folder 'pretrained_model' before running the following script.
+Our encoder and decoder use a Foundation model's [[link](https://github.com/ljwztc/CLIP-Driven-Universal-Model)] pre-trained weights [[link](https://pan.quark.cn/s/2ce82bc2c684)]. Please download them and put them into the folder 'pretrained_model' before running the following script.
 
 
 
