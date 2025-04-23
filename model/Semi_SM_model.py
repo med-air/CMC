@@ -243,8 +243,8 @@ class Semi_SM_model(nn.Module):
         CT_img_F_ds, CT_Skips = self.image_encoder(CT_img)
         MRI_img_F_ds, MRI_Skips = self.image_encoder(MRI_img)
 
-        # CT_img_F_mia = self.MIA_module(CT_img_F_ds)
-        # MRI_img_F_mia = self.MIA_module(MRI_img_F_ds)
+        CT_img_F_mia = self.MIA_module(CT_img_F_ds)
+        MRI_img_F_mia = self.MIA_module(MRI_img_F_ds)
         #
         #
         if CT_img_F_ds.shape[2] != MRI_img_F_ds.shape[2]:
@@ -252,7 +252,7 @@ class Semi_SM_model(nn.Module):
             MRI_img_F_ds = F.interpolate(MRI_img_F_ds, size=(depth, height, width), mode='trilinear',
                                      align_corners=True)
 
-        out_fuse = self.fusion_layer(CT_img_F_ds, MRI_img_F_ds)
+        out_fuse = self.fusion_layer(CT_img_F_mia, MRI_img_F_mia)
         CT_F_z = torch.cat([out_fuse, CT_img_F_ds], dim=1)
         MRI_F_z = torch.cat([out_fuse, MRI_img_F_ds], dim=1)
         CT_F_z = self.conv3d_convert(CT_F_z)
