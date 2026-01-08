@@ -215,7 +215,6 @@ ttach==0.0.3
 typer==0.9.4
 typing_extensions==4.11.0
 tzdata==2023.3
-urllib3==1.26.18
 virtualenv==20.26.1
 wasabi==1.1.2
 watchdog==4.0.0
