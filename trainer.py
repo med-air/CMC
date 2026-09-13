@@ -83,15 +83,19 @@ def train_epoch(model, unlabeled_model, ct_loader, mri_loader, ct_unlabeled_load
         # contrastive / consistency terms that operate on high-dimensional
         # feature maps. With AMP enabled we must unscale_() first so the
         # norm is computed against the original (un-scaled) gradients.
+        # `args.grad_clip_norm == 0` disables clipping.
+        clip_norm = getattr(args, 'grad_clip_norm', 1.0) or 0.0
         if args.amp:
             scaler.scale(loss).backward()
-            scaler.unscale_(optimizer)
-            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+            if clip_norm > 0:
+                scaler.unscale_(optimizer)
+                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=clip_norm)
             scaler.step(optimizer)
             scaler.update()
         else:
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+            if clip_norm > 0:
+                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=clip_norm)
             optimizer.step()
         if args.distributed:
             loss_list = distributed_all_gather([loss], out_numpy=True, is_valid=idx < ct_loader.sampler.valid_length)
