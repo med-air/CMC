@@ -106,30 +106,56 @@ parser.add_argument('--pretrain', default=1, type=int)
 
 def CAC_loss(pred1, pred2, similarity='cosine'):
     """
-    Compute CAC loss
+    Compute CAC loss (channel-wise anatomical consistency).
+
+    Numerical-stability notes (Issue #10):
+      * `eps` is added to every denominator / log / sqrt to prevent
+        zero-division when both predictions are empty or perfectly
+        disjoint.
+      * The fallback constant returned for the all-zero edge case is
+        created with `requires_grad=True` so that it still participates
+        in the autograd graph; a detached tensor here would silently
+        sever the gradient path from `CAC_loss` back into the model.
     """
-    if torch.sum(pred1) == 0 and torch.sum(pred2) == 0:
-        return torch.tensor(1.0, device=pred1.device)
+    eps = 1e-8
     smooth = 1e-6
+    # Use abs().sum() rather than `==` so the predicate itself carries
+    # no gradient (pure-Python comparison is fine, but be explicit).
+    if torch.sum(pred1).abs() < eps and torch.sum(pred2).abs() < eps:
+        return torch.tensor(1.0, device=pred1.device, requires_grad=True)
     dim_len = len(pred1.size())
     if dim_len == 5:
        dim=(2,3,4)
     elif dim_len == 4:
        dim=(2,3)
-    intersect = torch.sum(pred1 * pred2,dim=dim)
-    y_sum = torch.sum(pred1 * pred1,dim=dim)
-    z_sum = torch.sum(pred2 * pred2,dim=dim)
-    dice_sim = (2 * intersect + smooth) / (z_sum + y_sum + smooth)
+    else:
+        # 3D (or higher) inputs are not supported by this loss; fall back to
+        # summing over every non-batch, non-channel axis to stay robust.
+        dim = tuple(range(2, dim_len))
+    intersect = torch.sum(pred1 * pred2, dim=dim)
+    y_sum = torch.sum(pred1 * pred1, dim=dim)
+    z_sum = torch.sum(pred2 * pred2, dim=dim)
+    # Guard the denominator against degenerate (all-zero) channels.
+    dice_sim = (2 * intersect + smooth) / (z_sum + y_sum + smooth + eps)
     dice_sim = dice_sim.mean()
     if torch.isnan(dice_sim):
         dice_sim = torch.tensor(1.0, device=dice_sim.device, requires_grad=True)
     return dice_sim
 
-def CSC_loss(pred1,pred2):
-    channel_losses = 0.0
+def CSC_loss(pred1, pred2):
+    """
+    Channel-wise semantic consistency loss.
+
+    Numerical-stability notes (Issue #10):
+      * The NaN fallback tensor is created with `requires_grad=True` so
+        the autograd graph stays connected; otherwise this branch would
+        silently drop gradients to the encoder / fusion layer.
+    """
+    eps = 1e-8
+    channel_losses = torch.tensor(0.0, device=pred1.device, requires_grad=True)
     lens = pred1.shape[0]
-    for c in range(pred1.shape[0]):
-        pred1_output_channel = pred1[c, :, :, :]  # select the c_th channel of predi
+    for c in range(lens):
+        pred1_output_channel = pred1[c, :, :, :]  # select the c_th channel of pred1
         pred2_output_channel = pred2[c, :, :, :]  # select the c_th channel of pred2
         pred1_2d_flat = pred1_output_channel.reshape(-1, pred1_output_channel.shape[0])  # resize shape
         pred2_2d_flat = pred2_output_channel.reshape(-1, pred2_output_channel.shape[0])  # resize shape
@@ -137,7 +163,8 @@ def CSC_loss(pred1,pred2):
         cl_loss = ContrastiveLoss(batch_size=2, temperature=0.5)
         cl_value = cl_loss(pred1_2d_flat, pred2_2d_flat)
         channel_losses = channel_losses + cl_value
-    mean_loss = channel_losses/ lens
+    # Guard against division-by-zero if `lens` is somehow 0.
+    mean_loss = channel_losses / (lens + eps)
     if torch.isnan(mean_loss):
         mean_loss = torch.tensor(1.0, device=mean_loss.device, requires_grad=True)
     return mean_loss

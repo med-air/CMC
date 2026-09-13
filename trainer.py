@@ -60,11 +60,16 @@ def train_epoch(model, unlabeled_model, ct_loader, mri_loader, ct_unlabeled_load
             loss = sup_loss
         if epoch >= args.start_fusion_epoch:
             ### start semi-supervised on unlabeled data
-            model.cuda()
+            # NOTE: keep model in eval() for the unlabeled forward pass so that the
+            # pseudo-target statistics are stable (BN running stats are not updated
+            # by unlabeled batches and dropout is disabled). Crucially we must NOT
+            # wrap the forward in `torch.no_grad()` here, otherwise the autograd
+            # graph for the unlabeled branch is detached and gradients from the
+            # cross-modality consistency terms (`CSC_loss`, `CAC_loss`) cannot flow
+            # back into the encoder / fusion layer. See Issue #24.
             model.eval()
             with autocast(enabled=args.amp):
-                with torch.no_grad():
-                    ct_img_F_ds, mri_img_F_ds, ct_unlabeled_output, mri_unlabeled_output = model(ct_unlabeled_data, mri_unlabeled_data)
+                ct_img_F_ds, mri_img_F_ds, ct_unlabeled_output, mri_unlabeled_output = model(ct_unlabeled_data, mri_unlabeled_data)
                 ### compute CSC loss
                 CSC_loss = CSC_loss_func(ct_img_F_ds, mri_img_F_ds)
                 CAC_loss = CAC_loss_func(ct_unlabeled_output, mri_unlabeled_output)
@@ -74,12 +79,19 @@ def train_epoch(model, unlabeled_model, ct_loader, mri_loader, ct_unlabeled_load
                 consistency_weight_cac = cosine_rampdown(epoch, args.max_epochs)
                 loss = sup_loss + consistency_weight_csc * CSC_loss + consistency_weight_cac * CAC_loss
 
+        # Gradient clipping (Issue #10): caps exploding gradients from the
+        # contrastive / consistency terms that operate on high-dimensional
+        # feature maps. With AMP enabled we must unscale_() first so the
+        # norm is computed against the original (un-scaled) gradients.
         if args.amp:
             scaler.scale(loss).backward()
+            scaler.unscale_(optimizer)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             scaler.step(optimizer)
             scaler.update()
         else:
             loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             optimizer.step()
         if args.distributed:
             loss_list = distributed_all_gather([loss], out_numpy=True, is_valid=idx < ct_loader.sampler.valid_length)
@@ -89,19 +101,25 @@ def train_epoch(model, unlabeled_model, ct_loader, mri_loader, ct_unlabeled_load
         else:
             run_loss.update(loss.item(), n=args.batch_size)
         if args.rank == 0:
+            # `detach()` here is intentional — these values are used purely
+            # for human-readable logging after `loss.backward()` has already
+            # populated the gradients, so severing the graph for the print
+            # call has no effect on training.
+            csc_log = CSC_loss.detach() if torch.is_tensor(CSC_loss) else CSC_loss
+            cac_log = CAC_loss.detach() if torch.is_tensor(CAC_loss) else CAC_loss
             print(
                 "Epoch {}/{} {}/{}".format(epoch, args.max_epochs, idx, len(ct_loader)),
                 "loss: {:.4f}".format(run_loss.avg),
-                "CSC_loss: {:.4f}".format(CSC_loss),
-                "CAC_loss: {:.4f}".format(CAC_loss),
+                "CSC_loss: {:.4f}".format(csc_log),
+                "CAC_loss: {:.4f}".format(cac_log),
                 "time {:.2f}s".format(time.time() - start_time),
             )
             with open(os.path.join(save_log_dir, 'log.txt'), 'a') as f:
                 print(
                     "Epoch {}/{} {}/{}".format(epoch, args.max_epochs, idx, len(ct_loader)),
                     "loss: {:.4f}".format(run_loss.avg),
-                    "CSC_loss: {:.4f}".format(CSC_loss),
-                    "CAC_loss: {:.4f}".format(CAC_loss),
+                    "CSC_loss: {:.4f}".format(csc_log),
+                    "CAC_loss: {:.4f}".format(cac_log),
                     "time {:.2f}s".format(time.time() - start_time),file=f
                 )
         start_time = time.time()
