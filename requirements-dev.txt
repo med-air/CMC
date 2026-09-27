@@ -1,0 +1,11 @@
+# Minimal dev/test dependencies. The full training stack
+# (requirements.txt) pulls in Foundation-model checkpoints, CUDA
+# builds, and tensorboardX; these are NOT needed to run the
+# regression test suite in tests/.
+#
+#   pip install -r requirements-dev.txt
+#   python -m pytest tests/ -v
+#
+torch>=2.0
+monai>=1.3
+pytest>=7.0
